@@ -81,10 +81,12 @@ export class ChooseGamePageComponent implements OnInit, OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: (games) => {
+                        console.log('Admin - Games loaded:', games);
                         this.games = games;
                         this.extractFilterOptions();
                         this.applyFilters();
                     },
+                    error: (err) => console.error('Error loading admin games:', err),
                 });
         } else {
             this.gameService
@@ -92,10 +94,12 @@ export class ChooseGamePageComponent implements OnInit, OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: (games) => {
+                        console.log('Visible games loaded:', games);
                         this.games = games;
                         this.extractFilterOptions();
                         this.applyFilters();
                     },
+                    error: (err) => console.error('Error loading visible games:', err),
                 });
         }
     }
@@ -108,6 +112,7 @@ export class ChooseGamePageComponent implements OnInit, OnDestroy {
             }
         });
         this.gameModes = Array.from(modesSet);
+        console.log('Extracted game modes:', this.gameModes);
 
         const sizesSet = new Set<string>();
         this.games.forEach((game) => {
@@ -116,12 +121,14 @@ export class ChooseGamePageComponent implements OnInit, OnDestroy {
             }
         });
         this.sizes = Array.from(sizesSet);
+        console.log('Extracted sizes:', this.sizes);
     }
 
     applyFilters(): void {
         this.filteredGames = this.games.filter((game) => {
             if (this.visibilityFilter !== 'all') {
                 const isVisible = this.visibilityFilter === 'visible';
+                console.log('Checking visibility:', game.visibility, 'Expected:', isVisible);
                 if (game.visibility !== isVisible) {
                     return false;
                 }
@@ -137,6 +144,7 @@ export class ChooseGamePageComponent implements OnInit, OnDestroy {
 
             return true;
         });
+        console.log('Filtered games:', this.filteredGames);
     }
 
     onVisibilityFilterChange(): void {

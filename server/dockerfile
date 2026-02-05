@@ -1,0 +1,26 @@
+FROM node:20-alpine AS build
+
+RUN apk add --no-cache python3 make g++ git
+
+WORKDIR /app
+
+COPY server/package*.json ./server/
+COPY server ./server
+COPY common ./common
+
+WORKDIR /app/server
+RUN npm install
+RUN npm run build
+
+FROM node:20-alpine
+
+WORKDIR /app/server
+COPY --from=build /app/server/dist ./dist
+COPY --from=build /app/server/package*.json ./
+COPY --from=build /app/common ../common
+COPY server/.env ./
+
+RUN npm install
+
+EXPOSE 3000
+CMD ["node", "dist/server/app/index.js"]
